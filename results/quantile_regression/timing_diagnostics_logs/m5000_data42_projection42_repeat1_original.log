@@ -1,0 +1,42 @@
+
+Gurobi 13.0.3 (win64) logging started Mon Oct  5 13:55:48 2026
+
+Set parameter LogFile to value "results\quantile_regression\timing_diagnostics_logs\m5000_data42_projection42_repeat1_original.log"
+Gurobi Optimizer version 13.0.3 build v13.0.3rc0 (win64 - Windows 11+.0 (26200.2))
+
+CPU model: AMD Ryzen 7 5825U with Radeon Graphics, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 1 threads
+
+Non-default parameters:
+LogToConsole  0
+Seed  42
+Threads  1
+
+Optimize a model with 5000 rows, 10399 columns and 1606000 nonzeros (Min)
+Model fingerprint: 0x37300496
+Model has 10000 linear objective coefficients
+Coefficient statistics:
+  Matrix range     [2e-07, 1e+00]
+  Objective range  [2e-01, 8e-01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e-04, 1e+00]
+
+Presolve time: 1.07s
+Presolved: 5000 rows, 10399 columns, 1606000 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0      handle free variables                          1s
+    1080    1.4172638e+02   8.412009e+04   0.000000e+00      5s
+    2220    3.3942294e+02   9.174420e+04   0.000000e+00     10s
+    3410    5.3852327e+02   6.500876e+04   0.000000e+00     16s
+    4440    6.9120187e+02   3.741178e+04   0.000000e+00     20s
+    5660    8.3958729e+02   1.185542e+05   0.000000e+00     25s
+    6810    9.4447555e+02   1.158038e+04   0.000000e+00     30s
+    7960    1.0219374e+03   6.097015e+04   0.000000e+00     35s
+    9210    1.0778853e+03   5.320899e+03   0.000000e+00     40s
+   10350    1.1096644e+03   2.568807e+03   0.000000e+00     45s
+   11590    1.1220947e+03   2.302413e+02   0.000000e+00     51s
+   12058    1.1230374e+03   0.000000e+00   0.000000e+00     53s
+
+Solved in 12058 iterations and 52.58 seconds (126.59 work units)
+Optimal objective  1.123037359e+03
