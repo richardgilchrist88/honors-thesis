@@ -1,5 +1,17 @@
 # Scientific source and experiment baseline
 
+**Current revision (2026-11-02):** the user authorized implementation of the audit
+fixes. See [methodology-fixes.md](methodology-fixes.md). The active reference notebook
+retains its data setup but uses corrected shared VN/Dykstra/AARM routines, checks both
+feasibility tolerances, and adds minimization bisection. Version 1.1 table experiments
+use grid-independent keyed seeds. Pre-change source/notebooks and outputs are preserved;
+the settings and observations below describe that historical baseline.
+
+For the subsequent repository-wide review, confirmed counterexamples and outstanding
+methodological issues, see [methodology-audit.md](methodology-audit.md) (2026-11-02).
+That review inspected the preserved authors' code as well as the local paper; the
+historical notes below retain their original baseline context.
+
 Recorded on 2026-10-12 from the local PDF and the user-designated reference notebook. These notes provide persistent context; consult the PDF for complete arguments and assumptions.
 
 ## Source
@@ -44,7 +56,7 @@ The paper samples nonzero data values uniformly from [-1, 1], uses design densit
 - Section 3.5, page 13: affine projection is approximated using LSMR. Equation (19) constructs a closest point on a line through two approximately affine-feasible points. This is a heuristic, not automatically the exact orthogonal projection onto the entire affine space.
 - Section 3.5 also describes a final bisection step to improve the objective along a segment toward the projected solution while retaining approximate equality feasibility.
 
-## Current notebook choices
+## Pre-fix notebook choices (historical)
 
 These are observed implementation settings, not certification of correctness or exact reproduction:
 

@@ -1,1 +1,8 @@
 .venv/
+
+__pycache__/
+*.pyc
+results/result_table_generator_smoke/
+results/table-test-*/
+results/toy_example_v2/
+results/gurobi_toy_example_v2/

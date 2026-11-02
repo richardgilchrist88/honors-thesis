@@ -1,0 +1,34 @@
+{
+  "full_published_sweeps_executed": false,
+  "notebooks": {
+    "problems\\quantile_regression\\Liberti_QuantileRegression_m5000_RP_Retrieval.ipynb": {
+      "all_code_cells_executed": true,
+      "validation_row_size": 450,
+      "configured_row_size": 5000,
+      "bisection_statuses": {
+        "apm": "objective_interval_tolerance",
+        "dykstra": "skipped_infeasible_start",
+        "aarm": "skipped_infeasible_start"
+      },
+      "feasibility": {
+        "apm": true,
+        "dykstra": false,
+        "aarm": false
+      }
+    },
+    "problems\\toy_example\\gurobi_toy_example.ipynb": {
+      "all_code_cells_executed": true,
+      "trials": 50,
+      "apm_feasible": 0,
+      "max_apm_bound_violation": 0.0,
+      "output": "C:\\Users\\richa\\OneDrive\\Documents\\Honors Thesis\\results\\gurobi_toy_example_v2"
+    },
+    "problems\\toy_example\\rp_lp_toy_example.ipynb": {
+      "all_code_cells_executed": true,
+      "trials": 50,
+      "apm_feasible": 0,
+      "max_apm_bound_violation": 0.0,
+      "output": "C:\\Users\\richa\\OneDrive\\Documents\\Honors Thesis\\results\\toy_example_v2"
+    }
+  }
+}

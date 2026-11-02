@@ -1,0 +1,230 @@
+{
+  "reference_notebook": {
+    "locations": {
+      "solve_projection_system": {
+        "cell": 13,
+        "line_in_cell": 1
+      },
+      "bound_error_sum": {
+        "cell": 14,
+        "line_in_cell": 1
+      },
+      "retrieval_start": {
+        "cell": 14,
+        "line_in_cell": 15
+      },
+      "retrieve_apm": {
+        "cell": 14,
+        "line_in_cell": 22
+      },
+      "retrieve_dykstra": {
+        "cell": 20,
+        "line_in_cell": 1
+      },
+      "retrieve_aarm": {
+        "cell": 24,
+        "line_in_cell": 1
+      }
+    },
+    "von_neumann": {
+      "input": [
+        1.0,
+        0.0,
+        3.0
+      ],
+      "output": [
+        0.9999999999999996,
+        0.0,
+        1.0078124999999993
+      ],
+      "iterations": 8,
+      "status": "feasible",
+      "equality_l2": 0.007812499999999334
+    },
+    "dykstra": {
+      "input": [
+        -0.1,
+        1.0
+      ],
+      "reference_output": [
+        0.0,
+        1.0
+      ],
+      "reference_status": "small_combined_error",
+      "reference_iterations": 1,
+      "reference_bound_error": 0.0,
+      "generator_output": [
+        0.0,
+        1.0
+      ],
+      "generator_feasible": true
+    },
+    "aarm": {
+      "notebook_one_step": [
+        0.6760000000000002,
+        0.6199999999999999,
+        1.3520000000000003
+      ],
+      "composed_reflections_one_step": [
+        0.6760000000000002,
+        0.6199999999999999,
+        1.3520000000000003
+      ],
+      "difference_l2": 0.0
+    }
+  },
+  "toy_notebooks": {
+    "problems/toy_example/rp_lp_toy_example.ipynb": {
+      "locations": {
+        "compute_metrics": {
+          "cell": 13,
+          "line_in_cell": 6
+        },
+        "exact_equality_projection_update": {
+          "cell": 19,
+          "line_in_cell": 6
+        },
+        "apm_retrieval": {
+          "cell": 25,
+          "line_in_cell": 6
+        }
+      },
+      "input": [
+        1.0,
+        5.0,
+        0.0
+      ],
+      "output": [
+        1.0,
+        5.0,
+        3.9999990463256836
+      ],
+      "recorded_metrics": {
+        "objective": 9.999999046325684,
+        "eq_residual": 9.5367431640625e-07,
+        "negativity_sum": 0.0,
+        "min_entry": 1.0,
+        "upper_violation_sum": 0.0,
+        "bound_violation_sum": 0.0,
+        "max_bound_violation": 0.0,
+        "feasible": true
+      },
+      "upper_bound": 5,
+      "measured_max_upper_violation": 0.0,
+      "stop_stage": "after_clip"
+    },
+    "problems/toy_example/gurobi_toy_example.ipynb": {
+      "locations": {
+        "compute_metrics": {
+          "cell": 19,
+          "line_in_cell": 6
+        },
+        "exact_equality_projection_update": {
+          "cell": 25,
+          "line_in_cell": 5
+        },
+        "apm_retrieval": {
+          "cell": 31,
+          "line_in_cell": 6
+        }
+      },
+      "input": [
+        1.0,
+        5.0,
+        0.0
+      ],
+      "output": [
+        1.0,
+        5.0,
+        3.9999990463256836
+      ],
+      "recorded_metrics": {
+        "objective": 9.999999046325684,
+        "eq_residual": 9.5367431640625e-07,
+        "negativity_sum": 0.0,
+        "min_entry": 1.0,
+        "upper_violation_sum": 0.0,
+        "bound_violation_sum": 0.0,
+        "max_bound_violation": 0.0,
+        "feasible": true
+      },
+      "upper_bound": 5,
+      "measured_max_upper_violation": 0.0,
+      "stop_stage": "after_clip"
+    }
+  },
+  "cross_sweep_seeds": [
+    {
+      "row_size": 5000,
+      "table5_instance_seed": 6374124054141049875,
+      "table6_instance_seed": 6374124054141049875,
+      "same_instance_seed": true
+    },
+    {
+      "row_size": 6000,
+      "table5_instance_seed": 9161461646655636672,
+      "table6_instance_seed": 9161461646655636672,
+      "same_instance_seed": true
+    },
+    {
+      "row_size": 7000,
+      "table5_instance_seed": 13005064469476318983,
+      "table6_instance_seed": 13005064469476318983,
+      "same_instance_seed": true
+    },
+    {
+      "row_size": 8000,
+      "table5_instance_seed": 17760758932626626218,
+      "table6_instance_seed": 17760758932626626218,
+      "same_instance_seed": true
+    },
+    {
+      "row_size": 9000,
+      "table5_instance_seed": 671368020672939040,
+      "table6_instance_seed": 671368020672939040,
+      "same_instance_seed": true
+    }
+  ],
+  "provenance": {
+    "authors_commit": "a847aa23f8ce597e181c1a1cea75c1cbfcb325c9",
+    "authors_file_hashes_match": {
+      "rp4lp.py": true,
+      "quantreggen.py": true,
+      "dietgen.py": true,
+      "quantreg.mod": true,
+      "quantregprj.mod": true,
+      "diet.mod": true,
+      "dietprj1.mod": true,
+      "dietprj2.mod": true,
+      "maketables.py": true,
+      "LICENSE": true,
+      "README.md": true,
+      "geninstances.sh": true
+    },
+    "reviewed_input_sha256": {
+      "Liberti et al.pdf": "3bbef3148b18f0d7231fa78728387e0367ed409037ccb16c610f43a2e573cd16",
+      "src/quantile_regression.py": "52ce2615db69bbfd771f2659039b5ca2efbd714a1295348260c6cd58f381748e",
+      "src/retrieval_methods.py": "a94982512b1cb5a22cbfa636e4545cf437c25f99cad4e2eccbb731e990275124",
+      "src/toy_retrieval.py": "22ff04ef5cddf3c846fecdaad111b0418293dff67955308841ad89700e4ad03b",
+      "problems/quantile_regression/Liberti_QuantileRegression_m5000_RP_Retrieval.ipynb": "b7eccb6f147fe84f48c5c7ff9d77dd0498d9ed5e4e82b58f973b8957fcff9529",
+      "problems/toy_example/rp_lp_toy_example.ipynb": "da78086c458cc9b049b8c03ef06152ad6eb5440c8d84c70c8a1ea2822763b560",
+      "problems/toy_example/gurobi_toy_example.ipynb": "252f51c795b7c3763af5e03e2135fde773a360ff22e473b09a734c4216de9630",
+      "problems/result_table_generator.ipynb": "74816d90f5cd79c3a475a987db701b93560209ff2bceee26d2c1373d08032a95",
+      "scripts/validate_result_tables.py": "101bb6b168ae28b2f2735e85b026c1a5a20133da89d6363604cdae361e397ad7",
+      "src/result_tables/__init__.py": "8edcf521a9d55cb137d238b272b46b7b50766d8ec5284d5a48a8a77f6310cba1",
+      "src/result_tables/common.py": "526ff97eb403d9cbe295085b5a931f4dcb52ad0e6cde20cb90dfed5a88e4b2cb",
+      "src/result_tables/config.py": "b5ed1e9f3d34d90c4847102126322c6cc5b1aadc93b25ac4b617f9eae36962aa",
+      "src/result_tables/diet_problem.py": "b5c237b29364710ef81ca5dae7266a87eb64d0d4a518738eba9aa6aeeb3b9ab7",
+      "src/result_tables/gurobi_solver.py": "6cb04d84505c403e3895712ecb4de63222ed88a38370fae52f0904f9bc502a65",
+      "src/result_tables/metrics.py": "ec8ffe1bb9eca6e579a9f4d9da4dc04c3b6dfd08a3464a99ef45e3e4edd02e50",
+      "src/result_tables/pipeline.py": "ade3a588f806af4a135862e63a3b3c3200708bd3af3c8cd08944d8c454399ed6",
+      "src/result_tables/projection.py": "7a04486ad25d23ae8f9da7dddf11e5b9da1a3344d161ab49852b1339a3c736d8",
+      "src/result_tables/provenance.py": "9a1545cf972021b2b161323016c9170fd8d3ca4d43edae6e7fe81476075dee6e",
+      "src/result_tables/quantile_regression.py": "de6b5a108a10fa9bddbb3b3f564c6c68bbb025a1347e17696be00137363072d1",
+      "src/result_tables/reporting.py": "5f01eec7a036007a17e5b36cdecff4ae0c12f7b9876c8c61aeaae401043d73d7",
+      "src/result_tables/retrieval.py": "c9866c10593684c6113bb92519b1a18ca5cf7636381be12ea67b5ed9b98fce7b",
+      "src/result_tables/runner.py": "15d874566ab796ebc1aef7dd60264c494c26b38750a58be4d96f93535455ea63",
+      "src/result_tables/seeding.py": "10db0f016830acdf974d6e56a2dd9ea4722647282e06676a90b52dcb1c827bc3"
+    }
+  }
+}

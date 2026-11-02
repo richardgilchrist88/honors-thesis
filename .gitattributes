@@ -1,0 +1,2 @@
+# Reference snapshots have byte-level provenance manifests. Preserve their bytes.
+references/** -text
