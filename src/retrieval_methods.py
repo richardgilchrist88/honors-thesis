@@ -11,8 +11,9 @@ from scipy.sparse.linalg import lsmr
 from .result_tables import config
 from .result_tables.common import LinearProgram
 from .result_tables.retrieval import (
-    affine_line_projection, bisect_toward_projected, retrieve,
+    affine_line_projection, bisect_toward_projected, retrieve, errors,
 )
+from .result_tables.retrieval_trace import record_iteration
 
 
 def bound_error_sum(x, lb, ub):
@@ -42,12 +43,20 @@ def _settings(max_iter, delta):
     return replace(config.RETRIEVAL, max_iterations=max_iter, tolerance=delta)
 
 
-def _alternating(x0, A, b, lb, ub, max_iter, delta, *, reflection=False, alpha=.9, beta=.9):
+def _alternating(x0, A, b, lb, ub, max_iter, delta, *, reflection=False, alpha=.9, beta=.9,
+                 trace=None):
     _settings(max_iter, delta)
     x = retrieval_start(x0, A, b)
     x_check = lsmr(A, b)[0]
+    method = 'AARM' if reflection else 'VN'
     for iteration in range(1, max_iter + 1):
-        if retrieval_feasibility(x, A, b, lb, ub, tol=delta):
+        feasible = retrieval_feasibility(x, A, b, lb, ub, tol=delta)
+        if trace is not None:
+            bound, equality, _ = errors(x, A, b, lb, ub)
+            record_iteration(trace, method, iteration - 1, 'before_update', bound,
+                             equality, delta, max_iter, feasibility_checked=True,
+                             branch='feasible' if feasible else 'continue')
+        if feasible:
             return x, iteration - 1, 'feasible'
         affine = solve_projection_system(x, A, b, x_check)
         if reflection:
@@ -58,34 +67,45 @@ def _alternating(x0, A, b, lb, ub, max_iter, delta, *, reflection=False, alpha=.
             new = np.clip(affine, lb, ub)  # P_S o P_U, Section 3.4
         if not np.isfinite(new).all():
             raise FloatingPointError('Retrieval produced a nonfinite iterate')
-        if retrieval_feasibility(new, A, b, lb, ub, tol=delta):
+        feasible = retrieval_feasibility(new, A, b, lb, ub, tol=delta)
+        step = float(np.linalg.norm(new - x)) if trace is not None or not feasible else None
+        branch = ('feasible' if feasible else 'stagnated' if step <= delta else
+                  'iteration_limit' if iteration == max_iter else 'continue')
+        if trace is not None:
+            bound, equality, _ = errors(new, A, b, lb, ub)
+            record_iteration(trace, method, iteration, 'after_update', bound,
+                             equality, delta, max_iter, step=step, branch=branch,
+                             feasibility_checked=True, step_checked=not feasible)
+        if feasible:
             return new, iteration, 'feasible'
-        if np.linalg.norm(new - x) <= delta:
+        if step <= delta:
             return new, iteration, 'stagnated; check residuals'
         x = new
     return x, max_iter, 'iteration limit; check residuals'
 
 
-def retrieve_apm(x0, A, b, lb, ub, max_iter=30, delta=.01):
+def retrieve_apm(x0, A, b, lb, ub, max_iter=30, delta=.01, *, trace=None):
     """Von Neumann affine-then-bounds operator, preceded by the retrieval start."""
-    return _alternating(x0, A, b, lb, ub, max_iter, delta)
+    return _alternating(x0, A, b, lb, ub, max_iter, delta, trace=trace)
 
 
-def retrieve_dykstra(x0, A, b, lb, ub, max_iter=30, delta=.01):
+def retrieve_dykstra(x0, A, b, lb, ub, max_iter=30, delta=.01, *, trace=None):
     """Bounds-first Dykstra, identical to the table generator before bisection."""
     settings = _settings(max_iter, delta)
     # A zero objective disables bisection here; callers refine with their true c.
     lp = LinearProgram(A, b, np.zeros_like(x0), lb, ub)
-    answer = retrieve(x0, lp, settings)
+    answer = retrieve(x0, lp, settings, collect_trace=trace is not None)
+    if trace is not None:
+        trace.extend(answer.diagnostics['retrieval_trace'])
     return answer.x, answer.diagnostics['retrieval_iterations'], answer.diagnostics['retrieval_status']
 
 
-def retrieve_aarm(x0, A, b, lb, ub, max_iter=30, delta=.01, alpha=.9, beta=.9):
+def retrieve_aarm(x0, A, b, lb, ub, max_iter=30, delta=.01, alpha=.9, beta=.9, *, trace=None):
     """Apply (1-alpha) I + alpha (2 beta P_S-I) o (2 beta P_U-I)."""
     if not (0 <= alpha <= 1 and 0 <= beta <= 1):
         raise ValueError('alpha and beta must lie in [0, 1]')
     return _alternating(x0, A, b, lb, ub, max_iter, delta,
-                        reflection=True, alpha=alpha, beta=beta)
+                        reflection=True, alpha=alpha, beta=beta, trace=trace)
 
 
 def refine_retrieval(x, projected, A, b, c, lb, ub, delta=.01):

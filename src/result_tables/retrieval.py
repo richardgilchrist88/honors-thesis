@@ -9,6 +9,7 @@ from dataclasses import dataclass
 import numpy as np
 from scipy.sparse.linalg import lsmr
 from . import config
+from .retrieval_trace import record_iteration, stopping_explanation
 
 
 def errors(x, A, b, lower, upper):
@@ -55,9 +56,10 @@ class RetrievalResult:
     diagnostics: dict
 
 
-def retrieve(projected, lp, settings=None):
+def retrieve(projected, lp, settings=None, *, collect_trace=True):
     settings = config.RETRIEVAL if settings is None else settings
     trace = []
+    history = [] if collect_trace else None
 
     def least_squares(A, rhs):
         answer = lsmr(A, rhs, atol=settings.lsmr_atol, btol=settings.lsmr_btol,
@@ -77,6 +79,10 @@ def retrieve(projected, lp, settings=None):
     tol = settings.tolerance
     for iterations in range(1, settings.max_iterations + 1):
         bound, equality, _ = errors(x, A, b, lp.lower, lp.upper)
+        record_iteration(history, "Dykstra", iterations - 1, "before_update",
+                         bound, equality, tol, settings.max_iterations,
+                         branch="feasible" if bound <= tol and equality <= tol else "continue",
+                         feasibility_checked=True)
         if bound <= tol and equality <= tol:
             reason = "feasible"
             iterations -= 1
@@ -90,10 +96,23 @@ def retrieve(projected, lp, settings=None):
         if not np.isfinite(x).all():
             raise FloatingPointError("Dykstra produced a nonfinite iterate")
         bound, equality, _ = errors(x, A, b, lp.lower, lp.upper)
+        # Extra measurement only: keep the original branch order and updates.
+        step = float(np.linalg.norm(x - previous)) if collect_trace else None
         if bound + equality <= 2 * tol:
             reason = "small_combined_error"
+            record_iteration(history, "Dykstra", iterations, "after_update", bound,
+                             equality, tol, settings.max_iterations, step=step,
+                             branch=reason, combined_checked=True)
             break
-        if float(np.linalg.norm(x - previous)) <= tol:
+        if step is None:
+            step = float(np.linalg.norm(x - previous))
+        stagnated = step <= tol
+        branch = ("stagnated" if stagnated else "iteration_limit"
+                  if iterations == settings.max_iterations else "continue")
+        record_iteration(history, "Dykstra", iterations, "after_update", bound,
+                         equality, tol, settings.max_iterations, step=step,
+                         branch=branch, combined_checked=True, step_checked=True)
+        if stagnated:
             reason = "stagnated"
             break
 
@@ -115,4 +134,8 @@ def retrieve(projected, lp, settings=None):
         "lsmr_calls": len(trace),
         "lsmr_iterations": sum(r["iterations"] for r in trace),
         "lsmr_trace": trace,
+        "retrieval_trace": history if history is not None else [],
+        "retrieval_explanation": stopping_explanation(
+            history, reason, final_feasible=bound <= tol and equality <= tol,
+            bisection_status=bisection_status, bisection_iterations=bisection_iterations),
     })

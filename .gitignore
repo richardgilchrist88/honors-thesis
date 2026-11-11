@@ -6,3 +6,6 @@ results/result_table_generator_smoke/
 results/table-test-*/
 results/toy_example_v2/
 results/gurobi_toy_example_v2/
+results/qr_retrieval_trace/
+results/retrieval_logging_sample/
+results/retrieval_logging_validation/

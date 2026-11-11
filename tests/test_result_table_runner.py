@@ -224,6 +224,10 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(metadata['failed_runs'], 2)
         self.assertEqual(len(metadata['trials']), 2)
         self.assertTrue(result.files['results.xlsx'].exists())
+        self.assertTrue(pd.read_csv(result.files['retrieval_trace.csv']).empty)
+        self.assertIn('failure stage: original', result.files['run.log'].read_text(encoding='utf-8'))
+        saved_config = json.loads(result.files['config.json'].read_text(encoding='utf-8'))
+        self.assertEqual(saved_config['parameters']['num_runs'], 2)
 
 
 if __name__ == '__main__':

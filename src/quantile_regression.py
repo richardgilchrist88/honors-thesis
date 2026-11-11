@@ -410,10 +410,10 @@ def retrieval_feasibility(x, A, b, lb, ub, tol=0.01, *, eq_tol=None, bound_tol=N
     return implementation(x, A, b, lb, ub, tol, eq_tol=eq_tol, bound_tol=bound_tol)
 
 
-def retrieve_apm(x0, A, b, lb, ub, max_iter=30, delta=0.01):
+def retrieve_apm(x0, A, b, lb, ub, max_iter=30, delta=0.01, *, trace=None):
     """Delegate to the corrected, shared notebook method."""
     from src.retrieval_methods import retrieve_apm as implementation
-    return implementation(x0, A, b, lb, ub, max_iter, delta)
+    return implementation(x0, A, b, lb, ub, max_iter, delta, trace=trace)
 
 def evaluate_retrieval(
     x: np.ndarray,
@@ -450,12 +450,12 @@ def evaluate_retrieval(
 
     return (objective_value, equality_residual, bound_violation)
 
-def retrieve_dykstra(x0, A, b, lb, ub, max_iter=30, delta=0.01):
+def retrieve_dykstra(x0, A, b, lb, ub, max_iter=30, delta=0.01, *, trace=None):
     """Delegate to the corrected, shared notebook method."""
     from src.retrieval_methods import retrieve_dykstra as implementation
-    return implementation(x0, A, b, lb, ub, max_iter, delta)
+    return implementation(x0, A, b, lb, ub, max_iter, delta, trace=trace)
 
-def retrieve_aarm(x0, A, b, lb, ub, max_iter=30, delta=0.01, alpha=0.9, beta=0.9):
+def retrieve_aarm(x0, A, b, lb, ub, max_iter=30, delta=0.01, alpha=0.9, beta=0.9, *, trace=None):
     """Delegate to the corrected, shared notebook method."""
     from src.retrieval_methods import retrieve_aarm as implementation
-    return implementation(x0, A, b, lb, ub, max_iter, delta, alpha, beta)
+    return implementation(x0, A, b, lb, ub, max_iter, delta, alpha, beta, trace=trace)

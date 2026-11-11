@@ -13,7 +13,7 @@ from .common import Timer
 from .projection import projection_dimension
 from .seeding import experiment_seed
 from .provenance import REPOSITORY_ROOT, METHODOLOGY, environment_metadata
-from .reporting import aggregate_trials, make_result, save_outputs
+from .reporting import aggregate_trials, make_result, save_outputs, format_run_log
 
 PROBLEMS = {"Quantile Regression": quantile_regression, "Diet Problem": diet_problem,
             "Basis Pursuit": None, "Max Flow": None}
@@ -107,6 +107,7 @@ def result_table_generator(problem_type, epsilon_min, epsilon_max, epsilon_incre
                 "successful_runs": int(raw.success.sum()), "failed_runs": int((~raw.success).sum())}
     result = make_result(raw, averaged, metadata, directory)
     save_outputs(result)
+    print(format_run_log(result), end="")
     if metadata["failed_runs"]:
         warnings.warn(f"{metadata['failed_runs']} trial(s) failed; inspect raw_trials and counts in {directory}", RuntimeWarning)
     return result

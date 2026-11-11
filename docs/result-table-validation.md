@@ -1,5 +1,24 @@
 # Result Table Generator validation
 
+**Iteration logging update (2026-11-10):** 49 tests passed, including all licensed
+Gurobi checks, branch-precedence/zero-update/iteration-cap cases, trace seed
+precision, failed-trial exports, and numerical-failure explanations. Twelve
+seeded method comparisons (three seeds, VN/Dykstra/AARM and pipeline Dykstra)
+matched the pre-change solution vectors exactly, with identical iteration
+counts/statuses and existing pipeline diagnostics. Traced/untraced comparisons
+also passed. This checks logging invariance, not agreement with the paper.
+
+`python scripts/validate_retrieval_logging.py` executed the reference QR notebook
+with 450 rows **in memory**, plus one QR and one paired Diet projection through
+the standard exporter. Saved trace identities/seeds, stopping branches,
+configuration and console/log consistency passed. Samples are in
+`results/retrieval_logging_sample/`, including `reference-qr-m450/run.log`,
+`reference-qr-m450/console.log`, `reference-qr-m450/retrieval_trace.csv`, and
+`validation.json`. The saved reference remains 5000 rows; no published sweeps
+were executed. Windows private staging directories required the tests/export
+validation to run outside the filesystem sandbox. See the usage guide for the
+logging schema, timing overhead, and rerun instructions.
+
 **Revision 1.1:** 41 tests passed and the updated table notebook smoke examples
 completed using `python scripts/validate_result_tables.py --smoke-only`. See
 [methodology-fixes.md](methodology-fixes.md) for current outcomes and artifact paths.

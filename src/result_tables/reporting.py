@@ -10,6 +10,41 @@ import tempfile
 import numpy as np
 import pandas as pd
 from .metrics import TABLE_COLUMNS
+from .retrieval_trace import TRACE_COLUMNS
+
+TRIAL_ID_COLUMNS = ["problem_type", "row_size", "epsilon", "replication",
+                    "formulation_variant", "instance_seed", "projection_seed"]
+
+
+def iteration_table(raw):
+    """Flatten histories without coercing uint64 seeds through floating point."""
+    records = []
+    for trial in raw.to_dict(orient="records"):
+        history = trial.get("retrieval_trace", [])
+        if isinstance(history, str):
+            history = json.loads(history)
+        if not isinstance(history, list):
+            continue  # Failed/untraced trials have no invented iteration rows.
+        identity = {key: trial.get(key) for key in TRIAL_ID_COLUMNS}
+        records.extend(identity | row for row in history)
+    return pd.DataFrame.from_records(records, columns=TRIAL_ID_COLUMNS + TRACE_COLUMNS)
+
+
+def format_run_log(result):
+    lines = [f"Output: {result.output_path}",
+             f"Master seed: {result.metadata.get('master_seed')}",
+             "Parameters: " + json.dumps(result.metadata.get("parameters", {}), sort_keys=True),
+             "Tracing overhead is included in retrieval timing; file exports are excluded."]
+    for trial in result.raw_trials.to_dict(orient="records"):
+        lines.append("\n" + ", ".join(f"{key}={trial.get(key)}" for key in TRIAL_ID_COLUMNS))
+        lines.append(trial.get("retrieval_explanation", "No retrieval explanation available."))
+        lines.append(f"Original-space feasible: {trial.get('original_feasible')}; "
+                     f"completed trial: {trial.get('success')}; "
+                     f"failure stage: {trial.get('failure_stage', '')}.")
+        if not trial.get("success"):
+            lines.append(f"Solver statuses: original={trial.get('original_status')}, "
+                         f"projected={trial.get('projected_status')}; {trial.get('message', '')}")
+    return "\n".join(lines) + "\n"
 
 GROUP_COLUMNS = ["problem_type", "row_size", "epsilon", "formulation_variant"]
 AVERAGE_METRICS = TABLE_COLUMNS[1:] + [
@@ -56,6 +91,11 @@ class ExperimentResult:
     metadata: dict
     output_path: Path
     files: dict[str, Path] = field(default_factory=dict)
+
+    @property
+    def retrieval_trace(self):
+        """One row per stopping-check stage, identified by trial and method."""
+        return iteration_table(self.raw_trials)
 
     def preview(self, formulation_variant=None):
         """A Jupyter-renderable table with visible per-row success/failure counts."""
@@ -151,6 +191,12 @@ def save_outputs(result):
             if not stage.is_relative_to(directory):
                 raise RuntimeError("Staging directory escaped experiment output")
             result.raw_trials.to_csv(stage / "raw_trials.csv", index=False, float_format="%.17g")
+            result.retrieval_trace.to_csv(stage / "retrieval_trace.csv", index=False, float_format="%.17g")
+            (stage / "run.log").write_text(format_run_log(result), encoding="utf-8")
+            configuration = {key: result.metadata.get(key) for key in
+                             ("parameters", "master_seed", "configuration_hash", "environment")}
+            (stage / "config.json").write_text(json.dumps(configuration, indent=2, allow_nan=False) + "\n",
+                                              encoding="utf-8")
             result.averaged_results.to_csv(stage / "averaged_results.csv", index=False, float_format="%.17g")
             with pd.ExcelWriter(stage / "results.xlsx", engine="openpyxl") as workbook:
                 excel_raw = result.raw_trials.copy()

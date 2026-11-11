@@ -46,6 +46,7 @@ def one_replication(instance, epsilon, projection_seed, original_result, variant
         "retrieval_feasible": False, "failure_stage": "",
         "message": "", "projected_status": "NOT_RUN", "projected_status_code": None,
         "retrieval_status": "NOT_RUN", "retrieval_iterations": None,
+        "retrieval_trace": "[]", "retrieval_explanation": "Retrieval was not run.",
         "projection_digest": None, "f_projected": None, "f_retrieved": None,
         "projected_solver_objective": None, "retrieved_augmented_objective": None,
         "f_projected / f_original": float("nan"),
@@ -95,6 +96,7 @@ def one_replication(instance, epsilon, projection_seed, original_result, variant
         row.update(retrieval_cpu=retrieval_timer.cpu, retrieval_wall=retrieval_timer.wall,
                    **answer.diagnostics)
         row["lsmr_trace"] = json_text(row["lsmr_trace"])
+        row["retrieval_trace"] = json_text(row["retrieval_trace"])
         row["f_retrieved"] = objective(instance, answer.x)
         row["retrieved_augmented_objective"] = float(retrieval_lp.c @ answer.x)
         row.update(evaluate(instance, answer.x, retrieval_lp))
@@ -110,6 +112,8 @@ def one_replication(instance, epsilon, projection_seed, original_result, variant
             row.update(projection_cpu=projection_timer.cpu, projection_wall=projection_timer.wall)
         elif stage == "retrieval":
             row.update(retrieval_cpu=retrieval_timer.cpu, retrieval_wall=retrieval_timer.wall)
+            if row["retrieval_explanation"] == "Retrieval was not run.":
+                row["retrieval_explanation"] = f"Retrieval failed before returning a complete trace: {exc}"
         row.update(failure_stage=stage, message=str(exc), retrieval_status="NUMERICAL_ERROR")
     finally:
         row["t_projected"] = sum(row[key] for key in ("projection_cpu", "projected_solve_cpu", "retrieval_cpu"))

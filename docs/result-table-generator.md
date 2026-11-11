@@ -109,6 +109,9 @@ Files inside each directory:
 | File | Contents |
 |---|---|
 | `raw_trials.csv` | Every attempted replication, seeds, statuses, objectives, diagnostics, timing components |
+| `retrieval_trace.csv` | Dykstra stopping checks before/after each update, residuals, step norms, thresholds, and the actual exit branch, identified by problem/size/epsilon/replication/variant and seeds |
+| `run.log` | The readable stopping explanations also printed to the console, including separate bisection and feasibility results |
+| `config.json` | Run parameters, master seed, configuration hash, and environment/source metadata |
 | `averaged_results.csv` | High-precision means and success/failure/feasibility/defined-ratio counts |
 | `results.xlsx` | Raw and averaged sheets, one table and count sheet per variant |
 | `table_<variant>.csv` | Seven-column table with row-size index, full precision |
@@ -119,6 +122,57 @@ Files inside each directory:
 | `<variant>_feasibility.png` | Both average errors versus epsilon, grouped by size |
 | `<variant>_size_cpu.png` | Projection-size and CPU-time ratios versus epsilon |
 | `metadata.json` | Parameters, every seed, policies, versions, source hashes, hardware, artifact hashes |
+
+Iteration logging is enabled for table runs. `result.retrieval_trace` exposes the
+flattened trace as a DataFrame; raw trials also retain the history as JSON. The
+`iteration` column counts completed updates: a `before_update` row tests the
+current point without adding an update. An initially feasible point stops at 0.
+Filter `stopping_branch != "continue"` to find the exit row of each completed
+retrieval. `feasibility_checked`, `combined_error_checked`, and `step_checked`
+identify which predicates were actually evaluated; a measured small step does
+not imply the step check caused the exit. A combined-error exit takes priority
+over stagnation in Dykstra. The trace reports residuals **before bisection**;
+the final feasibility fields and bisection status remain separate in raw trials
+and the readable log. Failed trials that never complete retrieval have no
+fabricated trace rows, and an all-failed export still has CSV headers.
+
+Tracing preserves update formulas, tolerances, branch order and iteration caps.
+Its in-memory measurements/formatting add retrieval timing overhead; CSV/log
+writes occur after the timed pipelines. Logging schema 1 is included in the
+configuration identity so these timed runs use different output directories
+from older untraced configurations, while the numerical implementation remains
+revision 1.1. Do not interpret timing differences as algorithmic speed changes.
+
+For the reference QR notebook, restart the kernel and Run All. Its last cell
+saves VN, Dykstra and AARM histories to `results/qr_retrieval_trace/`, with
+`retrieval_trace.csv`, `config.json` and `run.log`. Existing three-value method
+returns are unchanged. Direct callers can collect a history using:
+
+```python
+from src.retrieval_methods import retrieve_apm
+history = []
+x, iterations, status = retrieve_apm(x0, A, b, lb, ub, trace=history)
+```
+
+The same optional `trace` argument is available for Dykstra and AARM, including
+the notebook-facing helpers in `src/quantile_regression.py`. These comparison
+methods retain their own stopping checks; VN/AARM do not gain Dykstra's
+combined-error rule. Their measured residuals can be inspected in the same schema.
+
+To generate small seeded examples without a full sweep:
+
+```powershell
+.\.venv\Scripts\python.exe -X utf8 scripts/validate_retrieval_logging.py
+```
+
+This executes the reference comparison with **450 rows in memory** (its saved
+configuration stays at 5000), then one QR and one paired Diet projection.
+Artifacts and captured console output are saved under
+`results/retrieval_logging_sample/`. These are validation examples of the current
+code, not reproductions of the historical iteration-12 run. The archive is
+unchanged. The script also checks traced versus untraced numerical results on
+three seeded fixtures; when the locally captured pre-change `before.json` is
+present, it additionally checks those original results.
 
 All outputs are staged before replacement. Existing owned files are backed up during
 replacement and restored if replacement raises an error. Metadata is written last

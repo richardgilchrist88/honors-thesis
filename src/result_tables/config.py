@@ -106,6 +106,8 @@ def policy_metadata():
         "quantile_projected_solver": asdict(QUANTILE_SOLVER),
         "diet_projected_solver": asdict(DIET_SOLVER),
         "retrieval": asdict(RETRIEVAL),
+        "retrieval_logging": {"schema": 1, "enabled": True,
+                              "timing": "in-memory tracing included; exports excluded"},
         "objective_zero_tolerance": OBJECTIVE_ZERO_TOL,
         "projection": {"C0": 1, "density_factor": 0.5,
                        "support": "fixed count, uniform without replacement",
